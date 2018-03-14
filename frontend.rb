@@ -33,12 +33,16 @@ elsif input_option == "5"
   params = {}
   print "Enter contact FIRST name: "
   params["input_first_name"] = gets.chomp
+  print "Enter contact MIDDLE name: "
+  params["input_middle_name"] = gets.chomp
   print "Enter contact LAST name: "
   params["input_last_name"] = gets.chomp
   print "Enter contact EMAIL: "
   params["input_email"] = gets.chomp
   print "Enter contact PHONE NUMBER: "
   params["input_phone_number"] = gets.chomp
+  print "Enter contact BIO: "
+  params["input_bio"] = gets.chomp
 
   response = Unirest.post("http://localhost:3000/v1/contacts", parameters: params)
   contacts = response.body
@@ -59,18 +63,22 @@ elsif input_option == "7"
   params = {}
   print "FIRST name (#{contact["first_name"]}): "
   params["input_first_name"] = gets.chomp
+  print "MIDDLE name (#{contact["middle_name"]}): "
+  params["input_middle_name"] = gets.chomp
   print "LAST name (#{contact["last_name"]}): "
   params["input_last_name"] = gets.chomp
   print "EMAIL (#{contact["email"]}): "
   params["input_email"] = gets.chomp
   print "PHONE NUMBER (#{contact["phone_number"]}): "
   params["input_phone_number"] = gets.chomp
+  print "BIO (#{contact["bio"]}): "
+  params["input_bio"] = gets.chomp
   params.delete_if {|_key, value| value.empty? }
 
   response = Unirest.patch("http://localhost:3000/v1/contacts/#{id}", parameters: params)
   updated_contact = response.body
   puts JSON.pretty_generate(updated_contact)
-elsif input_option = "8"
+elsif input_option == "8"
   print "Enter the contact ID of which you would like to delete: "
   contact_id = gets.chomp
   response = Unirest.delete("http://localhost:3000/v1/contacts/#{contact_id}")
