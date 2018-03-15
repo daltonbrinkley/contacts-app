@@ -7,6 +7,7 @@ puts "[1] First Contact"
 puts "[2] Second Contact"
 puts "[3] Third Contact"
 puts "[4] ALL Contacts"
+puts "[4.1] Search Contacts by First Name"
 puts "[5] Create a new contact!" 
 puts "[6] Find Contact by ID"
 puts "[7] Update a contact!"
@@ -29,6 +30,12 @@ elsif input_option == "4"
   response = Unirest.get("http://localhost:3000/v1/contacts")
   contacts = response.body
   puts contacts
+elsif input_option == "4.1"
+  print "Please enter a first name: "
+  first_name_search = gets.chomp
+  response = Unirest.get("http://localhost:3000/v1/contacts?input_first_name=#{first_name_search}")
+  contact = response.body
+  puts JSON.pretty_generate(contact)
 elsif input_option == "5"
   params = {}
   print "Enter contact FIRST name: "
@@ -46,7 +53,13 @@ elsif input_option == "5"
 
   response = Unirest.post("http://localhost:3000/v1/contacts", parameters: params)
   contacts = response.body
-  puts JSON.pretty_generate(contacts)
+  if contacts["errors"] 
+    puts "Uh oh! Something is wrong!"
+    p contacts["errors"]
+  else
+    puts "Here is your contact info:"
+    puts JSON.pretty_generate(contacts)
+  end
   
 elsif input_option == "6"
   print "Please enter contact ID: "
@@ -77,7 +90,13 @@ elsif input_option == "7"
 
   response = Unirest.patch("http://localhost:3000/v1/contacts/#{id}", parameters: params)
   updated_contact = response.body
-  puts JSON.pretty_generate(updated_contact)
+  if updated_contact["errors"] 
+    puts "Uh oh! Something is wrong!"
+    p updated_contact["errors"]
+  else
+    puts "Here is your contact info:"
+    puts JSON.pretty_generate(updated_contact)
+  end
 elsif input_option == "8"
   print "Enter the contact ID of which you would like to delete: "
   contact_id = gets.chomp
