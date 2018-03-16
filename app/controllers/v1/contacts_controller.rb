@@ -39,7 +39,13 @@ class V1::ContactsController < ApplicationController
 
     search_all = params["input_anything"]
     if search_all
-      contacts = contacts.where()
+      contacts = contacts.where(
+        "first_name ILIKE ? OR last_name ILIKE ? OR email ILIKE ?",
+        "%#{search_all}%",
+        "%#{search_all}%",
+        "%#{search_all}%"
+        )
+    end
 
     render json: contacts.as_json 
   end

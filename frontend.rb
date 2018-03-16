@@ -8,6 +8,7 @@ puts "[2] Second Contact"
 puts "[3] Third Contact"
 puts "[4] ALL Contacts"
 puts "[4.1] Search Contacts by First Name"
+puts "[4.2] Search all Contacts by attributes"
 puts "[5] Create a new contact!" 
 puts "[6] Find Contact by ID"
 puts "[7] Update a contact!"
@@ -34,6 +35,12 @@ elsif input_option == "4.1"
   print "Please enter a first name: "
   first_name_search = gets.chomp
   response = Unirest.get("http://localhost:3000/v1/contacts?input_first_name=#{first_name_search}")
+  contact = response.body
+  puts JSON.pretty_generate(contact)
+elsif input_option == "4.2"
+  print "Please enter a search term:  "
+  anything_search = gets.chomp
+  response = Unirest.get("http://localhost:3000/v1/contacts?input_anything=#{anything_search}")
   contact = response.body
   puts JSON.pretty_generate(contact)
 elsif input_option == "5"
