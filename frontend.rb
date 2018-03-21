@@ -1,11 +1,69 @@
-
 require "unirest"
+require "tty-prompt"
+prompt = TTY::Prompt.new
 
 system "clear"
+
+puts "Welcome to the CONTACTS app! Please select an option: "
+puts "[login] Login (Create a JSON web token)"
+puts "[signup] Sign-up (Create a new user)"
+puts "[logout] Logout (Delete the JSON web token)"
+
+input_option = gets.chomp
+if input_option == "login"
+  # puts "Please enter your email address: "
+  # email = gets.chomp
+  # password = prompt.mask("Please enter your password: ") 
+  response = Unirest.post(
+    "http://localhost:3000/user_token",
+    parameters: {
+      auth: {
+        email: "sambrinkley@gmail.com",
+        password: "password"
+      }
+    }
+  )
+  jwt = response.body["jwt"]
+  Unirest.default_header("Authorization", "Bearer #{jwt}")
+elsif input_option == "signup"
+  params = {}
+  print "Please enter full name: "
+  params["name"] = gets.chomp
+  print "Enter your email: "
+  params["email"] = gets.chomp
+  params["password"] = prompt.mask("What is your password?")
+  params["password_confirmation"] = prompt.mask("Please re-enter your new password for verification: ")
+  response = Unirest.post("http://localhost:3000/v1/users", parameters: params)
+  p response.body  
+
+  puts "You have successfully created your account.  Please enter your email address to login: "
+  email = gets.chomp
+  password = prompt.mask("Please enter your password: ") 
+  response = Unirest.post(
+    "http://localhost:3000/user_token",
+    parameters: {
+      auth: {
+        email: "#{email}",
+        password: "#{password}"
+      }
+    }
+  )
+  jwt = response.body["jwt"]
+  Unirest.default_header("Authorization", "Bearer #{jwt}")
+elsif input_option == "logout"
+  jwt = ""
+  Unirest.clear_default_headers()
+end
+
+system "clear"
+puts "Your jwt is #{jwt}
+
+"
+
 puts "Choose an option"
-puts "[1] First Contact"
-puts "[2] Second Contact"
-puts "[3] Third Contact"
+# puts "[1] First Contact"
+# puts "[2] Second Contact"
+# puts "[3] Third Contact"
 puts "[4] ALL Contacts"
 puts "[4.1] Search Contacts by First Name"
 puts "[4.2] Search all Contacts by attributes"
@@ -15,19 +73,19 @@ puts "[7] Update a contact!"
 puts "[8] Delete a contact!"
 
 input_option = gets.chomp
-if input_option == "1"
-  response = Unirest.get("http://localhost:3000/v1/first_contact_url")
-  contact = response.body
-  puts "The info for Contact 1 is: #{contact}"
-elsif input_option == "2"
-  response = Unirest.get("http://localhost:3000/v1/second_contact_url")
-  contact = response.body
-  p contact
-elsif input_option == "3"
-  response = Unirest.get("http://localhost:3000/v1/third_contact_url")
-  contact = response.body
-  puts contact
-elsif input_option == "4"
+# if input_option == "1"
+#   response = Unirest.get("http://localhost:3000/v1/first_contact_url")
+#   contact = response.body
+#   puts "The info for Contact 1 is: #{contact}"
+# elsif input_option == "2"
+#   response = Unirest.get("http://localhost:3000/v1/second_contact_url")
+#   contact = response.body
+#   p contact
+# elsif input_option == "3"
+#   response = Unirest.get("http://localhost:3000/v1/third_contact_url")
+#   contact = response.body
+#   puts contact
+if input_option == "4"
   response = Unirest.get("http://localhost:3000/v1/contacts")
   contacts = response.body
   puts contacts

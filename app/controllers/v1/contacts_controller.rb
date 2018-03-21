@@ -1,54 +1,76 @@
 class V1::ContactsController < ApplicationController
-  def first_contact_method
-    contact = Contact.first
-    render json: {
-      first_name: contact.first_name,
-      last_name: contact.last_name,
-      email: contact.email,
-      phone_number: contact.phone_number
-    }
-  end
+  # def first_contact_method
+  #   contact = Contact.first
+  #   render json: {
+  #     first_name: contact.first_name,
+  #     last_name: contact.last_name,
+  #     email: contact.email,
+  #     phone_number: contact.phone_number
+  #   }
+  # end
 
-  def second_contact_method
-    contact = Contact.second
-    render json: {
-    first_name: contact.first_name,
-    last_name: contact.last_name,
-    email: contact.email,
-    phone_number: contact.phone_number
-    }
-  end
+  # def second_contact_method
+  #   contact = Contact.second
+  #   render json: {
+  #   first_name: contact.first_name,
+  #   last_name: contact.last_name,
+  #   email: contact.email,
+  #   phone_number: contact.phone_number
+  #   }
+  # end
 
-  def third_contact_method
-    contact = Contact.third
-    render json: {
-    first_name: contact.first_name,
-    last_name: contact.last_name,
-    email: contact.email,
-    phone_number: contact.phone_number
-    }
-  end
+  # def third_contact_method
+  #   contact = Contact.third
+  #   render json: {
+  #   first_name: contact.first_name,
+  #   last_name: contact.last_name,
+  #   email: contact.email,
+  #   phone_number: contact.phone_number
+  #   }
+  # end
 
   def index
-    contacts = Contact.all
+    if current_user
+      contacts = current_user.contacts.order(:id => :asc)
 
-    search_terms = params["input_first_name"]
-    if search_terms
-      contacts = contacts.where("first_name ILIKE ?", "%#{search_terms}")
-    end
+      search_terms = params["input_first_name"]
+      if search_terms
+        contacts = contacts.where("first_name ILIKE ?", "%#{search_terms}")
+      end
 
-    search_all = params["input_anything"]
-    if search_all
-      contacts = contacts.where(
+      search_all = params["input_anything"]
+      if search_all
+        contacts = contacts.where(
         "first_name ILIKE ? OR last_name ILIKE ? OR email ILIKE ?",
         "%#{search_all}%",
         "%#{search_all}%",
         "%#{search_all}%"
         )
-    end
+      end
 
-    render json: contacts.as_json 
+      render json: contacts.as_json
+    else
+      render json: []
+    end
   end
+
+    # search_terms = params["input_first_name"]
+    # if search_terms
+    #   contacts = contacts.where("first_name ILIKE ?", "%#{search_terms}")
+    # end
+
+  #   search_all = params["input_anything"]
+  #   if search_all
+  #     contacts = contacts.where(
+  #       "first_name ILIKE ? OR last_name ILIKE ? OR email ILIKE ?",
+  #       "%#{search_all}%",
+  #       "%#{search_all}%",
+  #       "%#{search_all}%"
+  #       )
+  #   end
+
+  #   render json: contacts.as_json 
+  # end
 
   def create
     contact = Contact.new(
@@ -57,8 +79,8 @@ class V1::ContactsController < ApplicationController
       last_name: params["input_last_name"],
       email: params["input_email"],
       phone_number: params["input_phone_number"],
-      bio: params["input_bio"]
-      )
+      bio: params["input_bio"],
+      user_id: current_user.id)
     if contact.save
       render json: contact.as_json
     else
@@ -93,5 +115,4 @@ class V1::ContactsController < ApplicationController
     contact.destroy
     render json: {message: "Contact deleted!"}
   end
-
 end
